@@ -1,0 +1,43 @@
+import static org.junit.Assert.assertTrue;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+public class WebapplicationTest {
+
+	private static WebDriver driver;
+	private WebElement webelement;
+
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		driver = new FirefoxDriver();
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		driver.quit();
+	}
+
+	@Test
+	public void replicate() throws Exception {
+		driver.get($element.getUrl());
+		
+		#foreach($number in $element.getRoop())
+		#set ($byFormInputList = $element.popByForFormInput())
+		#set ($FormInputValueList = $element.popFormInputValue())
+		#foreach($byFormInput in $byFormInputList)
+		webelement = driver.findElement($byFormInput);
+		driver.sendKeys($FormInputValueList.removeFirst())
+		#end
+		webelement = driver.findElement($element.popBy());
+		webelement.click();
+		#end
+		
+		assertTrue(driver.getTitle().equals("�uselenium�v�̌������� - Yahoo!����"));
+	}
+}

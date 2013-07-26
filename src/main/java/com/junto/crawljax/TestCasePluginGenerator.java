@@ -12,16 +12,24 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
-public class VeloTest {
-	private static String TEMPLATE_LOCATION = System.getProperty("user.dir");
+import com.crawljax.condition.invariant.Invariant;
+import com.crawljax.core.CrawlerContext;
+import com.crawljax.core.plugin.OnInvariantViolationPlugin;
 
-	public VeloTest() {
-		WebVelo web =
-		        new WebVelo("\"http://www.yahoo.co.jp/\"", "By.name(\"p\")", "\"selenium\"",
-		                "By.id(\"srchbtn\")");
+public class TestCasePluginGenerator implements OnInvariantViolationPlugin {
+	private String url;
+
+	@Override
+	public void onInvariantViolation(Invariant invariant, CrawlerContext context) {
+		System.out.println(context.getCrawlPath().size());
+		System.out.println(context.getCrawlPath().toString());
+
+		this.url = context.getConfig().getUrl().toString();
+
+		CrawlpathElement element = new CrawlpathElement(context.getCrawlPath(), url);
+
 		try {
 			// これをinitする前にいれないと動かない
-			// Velocity.setProperty("file.resource.loader.path", TEMPLATE_LOCATION);
 			Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
 			Velocity.setProperty("classpath.resource.loader.class",
 			        ClasspathResourceLoader.class.getName());
@@ -30,21 +38,19 @@ public class VeloTest {
 			Velocity.init();
 			// make Velocity context
 
-			VelocityContext context = new VelocityContext();
-			context.put("web", web);
+			VelocityContext velocitycontext = new VelocityContext();
+			velocitycontext.put("element", element);
 
-			File file = new File("VeloTester.java");
-			System.out.println(file.getAbsolutePath());
-
+			File file = new File("WebapplicationTest.java");
 			PrintWriter pw =
 			        new PrintWriter(file);
 
 			// StringWriter pw = new StringWriter();
 
 			// make Template
-			Template template = Velocity.getTemplate("sample.vm", "UTF-8");
+			Template template = Velocity.getTemplate("testTemplate.vm", "UTF-8");
 			// merge with template
-			template.merge(context, pw);
+			template.merge(velocitycontext, pw);
 			// print on console
 			// System.out.println(pw.toString());
 			pw.flush();
@@ -63,16 +69,6 @@ public class VeloTest {
 			System.err.println(e.getMessage());
 
 		}
-
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		new VeloTest();
-
 	}
 
 }
