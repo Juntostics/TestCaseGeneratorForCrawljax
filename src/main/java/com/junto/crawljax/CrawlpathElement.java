@@ -11,63 +11,50 @@ import com.crawljax.forms.FormInput;
 
 public class CrawlpathElement {
 	private final int size;
-	private ArrayList<Integer> roop;// for <foreach> of velocity
+	ArrayList<Integer> loop;// for <foreach> of velocity
 	private LinkedList<String> by;
-	private LinkedList<ArrayList<String>> byForFormInput;
-	private LinkedList<LinkedList<String>> formInputValue;
-	private LinkedList<ArrayList<Integer>> Index;
+	private LinkedList<CopyOnWriteArrayList<FormInputElement>> relatedFormInputsList;
 	private final String url;
-	private final static String doubleQuotation = "\"";
-	private CopyOnWriteArrayList<FormInput> FormInputs;
+	private final static String DOUBLEQUOTATION = "\"";
 
 	// private LinkedList<String> action; //click,hover
 
 	public CrawlpathElement(CrawlPath path, String url) {
 		this.size = path.size();
 		this.url = url;
-		roop = new ArrayList<Integer>();
+		loop = new ArrayList<Integer>();
 		for (int i = 0; i < size; i++) {
-			roop.add(i);
+			loop.add(i);
 		}
-		byForFormInput = new LinkedList<ArrayList<String>>();
-		formInputValue = new LinkedList<LinkedList<String>>();
-		Index = new LinkedList<ArrayList<Integer>>();
 		by = new LinkedList<String>();
+		relatedFormInputsList = new LinkedList<CopyOnWriteArrayList<FormInputElement>>();
 		while (path.size() > 0) {
 			Eventable ev = path.last();
-			FormInputs = ev.getRelatedFormInputs();
-			int i = 0;
-			for (FormInput formInput : FormInputs) {
-				ArrayList<Integer> tempIndex = new ArrayList<Integer>();
-				tempIndex.add(i);
-				Index.add(tempIndex);
-				i++;
-				ArrayList<String> tempBy = new ArrayList<String>();
-				tempBy.add(getWebDriverBy(formInput.getIdentification()));
-				byForFormInput.add(tempBy);
-				LinkedList<String> tempInputValue = new LinkedList<String>();
-				tempInputValue.add(formInput.getInputValues().iterator().next().getValue());
-				formInputValue.add(tempInputValue);
+			CopyOnWriteArrayList<FormInputElement> temporaryList =
+			        new CopyOnWriteArrayList<FormInputElement>();
+			for (FormInput formInput : ev.getRelatedFormInputs()) {
+				temporaryList.add(new FormInputElement(formInput));
 			}
+			System.out.println(ev.getRelatedFormInputs().size());
+			relatedFormInputsList.add(temporaryList);
 			path = path.immutableCopyWithoutLast();
 			by.add(getWebDriverBy(ev.getIdentification()));
 		}
 	}
 
-	public ArrayList<Integer> getIndex() {
-		return Index.removeLast();
+	public CopyOnWriteArrayList<FormInputElement> getFormInputElements() {
+		return relatedFormInputsList.getLast();
 	}
 
-	public ArrayList<Integer> getRoop() {
-		return roop;
+	public boolean FormInputIsEmpty() {
+		if (relatedFormInputsList.getLast().size() == 0)
+			return true;
+		else
+			return false;
 	}
 
-	public ArrayList<String> popByForFormInput() {
-		return byForFormInput.removeLast();
-	}
-
-	public LinkedList<String> popFormInputValue() {
-		return formInputValue.removeLast();
+	public ArrayList<Integer> getLoop() {
+		return loop;
 	}
 
 	public String popBy() {
@@ -75,32 +62,32 @@ public class CrawlpathElement {
 	}
 
 	public String getUrl() {
-		return doubleQuotation + url + doubleQuotation;
+		return DOUBLEQUOTATION + url + DOUBLEQUOTATION;
 	}
 
 	public String getWebDriverBy(Identification id) {
 
 		switch (id.getHow()) {
 			case name:
-				return "By.name(" + doubleQuotation + id.getValue() + doubleQuotation + ")";
+				return "By.name(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
 
 			case xpath:
 				// Work around HLWK driver bug
-				return "By.xpath(" + doubleQuotation
-				        + id.getValue().replaceAll("/BODY\\[1\\]/", "/BODY/") + doubleQuotation
+				return "By.xpath(" + DOUBLEQUOTATION
+				        + id.getValue().replaceAll("/BODY\\[1\\]/", "/BODY/") + DOUBLEQUOTATION
 				        + ")";
 
 			case id:
-				return "By.id(" + doubleQuotation + id.getValue() + doubleQuotation + ")";
+				return "By.id(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
 
 			case tag:
-				return "By.tagName(" + doubleQuotation + id.getValue() + doubleQuotation + ")";
+				return "By.tagName(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
 
 			case text:
-				return "By.linkText(" + doubleQuotation + id.getValue() + doubleQuotation + ")";
+				return "By.linkText(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
 
 			case partialText:
-				return "By.partialLinkText(" + doubleQuotation + id.getValue() + doubleQuotation
+				return "By.partialLinkText(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION
 				        + ")";
 
 			default:

@@ -24,13 +24,13 @@ public class InvariantExample {
 	 */
 	public static void main(String[] args) {
 		CrawljaxConfigurationBuilder builder =
-		        CrawljaxConfiguration.builderFor("https://www.google.co.jp/");
+		        CrawljaxConfiguration.builderFor("http://www.ahref.org/hinagata/form_all.html");
 
 		// Add the invariant that checks that the string isn't present.
 		builder.crawlRules().addInvariant(
 		        "Detect a string",
 		        new NotRegexCondition(
-		                "Invariants can be used to perform tests on the current state"));
+		                "アンケートご回答ありがとうございます。")); // "Invariants can be used to perform tests on the current state"
 
 		// This plugin will just print the error.
 

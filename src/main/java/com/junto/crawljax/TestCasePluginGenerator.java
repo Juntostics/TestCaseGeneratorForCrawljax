@@ -48,7 +48,7 @@ public class TestCasePluginGenerator implements OnInvariantViolationPlugin {
 			// StringWriter pw = new StringWriter();
 
 			// make Template
-			Template template = Velocity.getTemplate("testTemplate.vm", "UTF-8");
+			Template template = Velocity.getTemplate("auto-generatedTest.vm", "UTF-8");
 			// merge with template
 			template.merge(velocitycontext, pw);
 			// print on console

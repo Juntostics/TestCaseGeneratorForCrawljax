@@ -1,0 +1,58 @@
+import static org.junit.Assert.assertTrue;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.Select;
+
+
+public class WebapplicationTest {
+
+	private static WebDriver driver;
+	private WebElement webelement;
+	private Select selectElement;
+	
+
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		driver = new FirefoxDriver();
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		driver.quit();
+	}
+
+	@Test
+	public void replicate() throws Exception {
+		driver.get($element.getUrl());
+		
+		#foreach($number in $element.getLoop())
+		#if(!$element.FormInputIsEmpty())
+		#foreach($formInputElement in $element.getFormInputElements())
+		$formInputElement.generateFormInputCode();
+		#end
+		#end
+		
+		webelement = driver.findElement($element.popBy());
+		webelement.click();
+		#end
+		
+		EmbeddedBrowser browser = wrapBrowser(driver);
+    	Invariant userInvarint = genInvariant();
+    	assertTrue(userInvariant.getInvariantCondtion().check(browser));
+	}
+	
+	private EmbeddedBrowser wrapBrowser(WebDriver driver) {
+    	return WebDr....Browser(driver, /* extarcted information from CralerContext.getBrowser() */);
+  }
+
+  private Invariant genInvariant() {
+    // copyed from original
+  }
+	
+}
