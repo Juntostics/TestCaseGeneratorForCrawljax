@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.crawljax.core.CrawlerContext;
 import com.crawljax.core.state.CrawlPath;
 import com.crawljax.core.state.Eventable;
 import com.crawljax.core.state.Identification;
 import com.crawljax.forms.FormInput;
+import com.google.common.collect.ImmutableSortedSet;
 
 public class CrawlpathElement {
 	private final int size;
@@ -15,13 +17,20 @@ public class CrawlpathElement {
 	private LinkedList<String> by;
 	private LinkedList<CopyOnWriteArrayList<FormInputElement>> relatedFormInputsList;
 	private final String url;
+	private CrawlPath path;
+	private final CrawlerContext context;
+	private final ImmutableSortedSet<String> filterAttributes;
 	private final static String DOUBLEQUOTATION = "\"";
 
 	// private LinkedList<String> action; //click,hover
 
-	public CrawlpathElement(CrawlPath path, String url) {
+	public CrawlpathElement(CrawlerContext context) {
+		this.context = context;
+		this.url = context.getConfig().getUrl().toString();
+		this.path = context.getCrawlPath();
+		this.filterAttributes =
+		        context.getConfig().getCrawlRules().getPreCrawlConfig().getFilterAttributeNames();
 		this.size = path.size();
-		this.url = url;
 		loop = new ArrayList<Integer>();
 		for (int i = 0; i < size; i++) {
 			loop.add(i);
@@ -40,6 +49,14 @@ public class CrawlpathElement {
 			path = path.immutableCopyWithoutLast();
 			by.add(getWebDriverBy(ev.getIdentification()));
 		}
+	}
+
+	public ImmutableSortedSet<String> getFilterAttributes() {
+		return filterAttributes;
+	}
+
+	public CrawlerContext getContext() {
+		return context;
 	}
 
 	public CopyOnWriteArrayList<FormInputElement> getFormInputElements() {

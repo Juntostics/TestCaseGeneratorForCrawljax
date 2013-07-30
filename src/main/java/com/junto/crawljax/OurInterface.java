@@ -6,6 +6,4 @@ public interface OurInterface {
 
 	public Invariant genInvariant();
 
-	public String helperMethod();
-
 }

@@ -22,26 +22,26 @@ public class FormInputElement {
 	}
 
 	public String generateFormInputCode() {
-		switch (this.type) {
-			case "text":
-				return "driver.findElement(" + getWebDriverBy(this.identification)
-				        + ").sendKeys(" + DOUBLEQUOTATION
-				        + this.inputValues.iterator().next().toString() + DOUBLEQUOTATION + ");";
-			case "checkbox":
-			case "radio":
-				return "driver.findElement(" + getWebDriverBy(this.identification)
-				        + ").click();";
-			case "select":
-				String code =
-				        "selectElement = new Select(driver.findElement("
-				                + getWebDriverBy(this.identification)
-				                + "));" + CRLF;
-				for (InputValue inputValue : inputValues) {
-					code += generateSelectcode(inputValue);
-				}
-				return code;
-			default:
-				return null;
+		if (type.toLowerCase().startsWith("text")
+		        || type.equalsIgnoreCase("password")
+		        || type.equalsIgnoreCase("hidden")) {
+			return "driver.findElement(" + getWebDriverBy(this.identification)
+			        + ").sendKeys(" + DOUBLEQUOTATION
+			        + this.inputValues.iterator().next().toString() + DOUBLEQUOTATION + ");";
+		} else if (type.equals("checkbox") || type.equals("radio")) {
+			return "driver.findElement(" + getWebDriverBy(this.identification)
+			        + ").click();";
+		} else if (type.startsWith("select")) {
+			String code =
+			        "selectElement = new Select(driver.findElement("
+			                + getWebDriverBy(this.identification)
+			                + "));" + CRLF;
+			for (InputValue inputValue : inputValues) {
+				code += generateSelectcode(inputValue);
+			}
+			return code;
+		} else {
+			return null;
 		}
 	}
 
