@@ -8,8 +8,8 @@ public class InvariantViolatingTestGeneratorPlugin implements OnInvariantViolati
 
 	private TestCaseGenerator generator;
 
-	public InvariantViolatingTestGeneratorPlugin(String path) {
-		this.generator = new TestCaseGenerator(path);
+	public InvariantViolatingTestGeneratorPlugin(String pathToSourceFile) {
+		this.generator = new TestCaseGenerator(pathToSourceFile);
 	}
 
 	@Override

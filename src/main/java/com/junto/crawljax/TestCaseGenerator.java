@@ -15,24 +15,31 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import com.crawljax.core.CrawlerContext;
 
 public class TestCaseGenerator {
-	private final String path_to_sourcefile;
-	private String output_dir;
-	private String url;
+	private final String pathToSourceFile;
+	private String outputDirectryPath;
+	private String outputFileName = "GeneratedTestCase.java";
+	private String packageName;
 	private AnnotatedCodeExtractor extractor = null;
+	private long waitAfterReloadUrl = 500;
+	private long waitAfterEvent = 500;
 
-	public TestCaseGenerator(String path) {
-		this.path_to_sourcefile = path;
+	public TestCaseGenerator(String pathToSourceFile) {
+		this.pathToSourceFile = pathToSourceFile;
+		this.outputDirectryPath = new File(".").getAbsolutePath();
+		if (this.outputDirectryPath == "/")
+			outputDirectryPath = "";
+		this.packageName = TestCaseGenerator.class.getPackage().getName();
+		try {
+			this.extractor = new AnnotatedCodeExtractor(pathToSourceFile);
+		} catch (Exception e) {
+			throw (IllegalStateException) e;
+		}
 	}
 
 	public void generateTest(CrawlerContext context) {
-		this.url = context.getConfig().getUrl().toString();
+		this.waitAfterEvent = context.getConfig().getCrawlRules().getWaitAfterEvent();
+		this.waitAfterReloadUrl = context.getConfig().getCrawlRules().getWaitAfterReloadUrl();
 		CrawlpathElement element = new CrawlpathElement(context);
-		try {
-			extractor = new AnnotatedCodeExtractor(path_to_sourcefile);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
 		try {
 			// これをinitする前にいれないと動かない
@@ -47,17 +54,19 @@ public class TestCaseGenerator {
 			VelocityContext velocitycontext = new VelocityContext();
 			velocitycontext.put("element", element);
 			velocitycontext.put("extractor", extractor);
+			velocitycontext.put("className",
+			        outputFileName.substring(0, outputFileName.length() - 5));
+			velocitycontext.put("packageName", packageName);
+			velocitycontext.put("waitAfterReloadUrl", waitAfterReloadUrl);
+			velocitycontext.put("waitAfterEvent", waitAfterEvent);
 
-			File file = new File("WebapplicationTest.java");
+			File file = new File(outputDirectryPath + "/" + outputFileName);
 			PrintWriter pw =
 			        new PrintWriter(file);
 
 			// make Template
-			Template template = Velocity.getTemplate("auto-generatedTest.vm", "UTF-8");
-			// merge with template
+			Template template = Velocity.getTemplate("TemplateForTestGenerator.vm", "UTF-8");
 			template.merge(velocitycontext, pw);
-			// print on console
-			// System.out.println(pw.toString());
 			pw.flush();
 			pw.close();
 
@@ -72,13 +81,19 @@ public class TestCaseGenerator {
 			System.err.println(e.getMessage());
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-
 		}
 	}
 
-	public void setOutputDir(String output_dir) {
-		// TODO Auto-generated method stub
-		this.output_dir = output_dir;
+	public void setOutputDirectryPath(String outputDirectryPath) {
+		this.outputDirectryPath = outputDirectryPath;
+	}
+
+	public void setOutputFileName(String outputFileName) {
+		this.outputFileName = outputFileName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
 	}
 
 }

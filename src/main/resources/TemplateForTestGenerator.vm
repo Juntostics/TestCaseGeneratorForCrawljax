@@ -1,0 +1,75 @@
+package ${packageName};
+
+import static org.junit.Assert.assertTrue;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.Select;
+import com.crawljax.browser.EmbeddedBrowser;
+import com.crawljax.browser.WebDriverBackedEmbeddedBrowser;
+import com.google.common.collect.ImmutableSortedSet;
+import java.util.SortedSet;
+import java.util.TreeSet;
+#foreach($import in $extractor.getImportList())
+$import
+#end
+
+public class $className {
+
+	private static WebDriver driver;
+	private WebElement webElement;
+	private Select selectElement;
+	private final long waitAfterReloadUrl = $waitAfterReloadUrl;
+	private final long waitAfterEvent = $waitAfterEvent;
+
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		driver = new FirefoxDriver();
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		driver.quit();
+	}
+
+	@Test
+	public void replicate() throws Exception {
+		driver.get($element.getUrl());
+		
+		#foreach($number in $element.getLoop())
+		#if(!$element.FormInputIsEmpty())
+		#foreach($formInputElement in $element.getFormInputElements())
+		$formInputElement.generateFormInputCode()
+		#end
+		#end
+		
+		webElement = driver.findElement($element.popBy());
+		webElement.click();
+		#end
+		
+		WebDriverBackedEmbeddedBrowser browser = WebDriverBackedEmbeddedBrowser.withDriver(
+		driver,generateFilterAttributes(), waitAfterReloadUrl,waitAfterEvent);
+    	Invariant userInvariant = genInvariant();
+    	assertTrue(userInvariant.getInvariantCondition().check(embeddedBrowser));
+	}
+	
+	private ImmutableSortedSet<String> generateFilterAttributes(){
+		SortedSet<String> set = new TreeSet<String>();
+		#foreach($filterAttribute in $element.getFilterAttributes())
+		set.add("${filterAttribute}");
+		#end
+		return ImmutableSortedSet.copyOfSorted(set);
+	}
+		 
+    $extractor.getGenerateInvariantSourcecode()
+  
+  	#foreach($string in $extractor.getExtractToTestCodeSourcecode())
+  	$string
+  	#end
+  
+	
+}

@@ -2,7 +2,12 @@ package com.junto.crawljax;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 import com.crawljax.core.CrawlerContext;
 import com.crawljax.core.state.CrawlPath;
@@ -13,19 +18,15 @@ import com.google.common.collect.ImmutableSortedSet;
 
 public class CrawlpathElement {
 	private final int size;
-	ArrayList<Integer> loop;// for <foreach> of velocity
+	List<Integer> loop;// for <foreach> of velocity
 	private LinkedList<String> by;
 	private LinkedList<CopyOnWriteArrayList<FormInputElement>> relatedFormInputsList;
 	private final String url;
 	private CrawlPath path;
-	private final CrawlerContext context;
 	private final ImmutableSortedSet<String> filterAttributes;
 	private final static String DOUBLEQUOTATION = "\"";
 
-	// private LinkedList<String> action; //click,hover
-
 	public CrawlpathElement(CrawlerContext context) {
-		this.context = context;
 		this.url = context.getConfig().getUrl().toString();
 		this.path = context.getCrawlPath();
 		this.filterAttributes =
@@ -44,19 +45,23 @@ public class CrawlpathElement {
 			for (FormInput formInput : ev.getRelatedFormInputs()) {
 				temporaryList.add(new FormInputElement(formInput));
 			}
-			System.out.println(ev.getRelatedFormInputs().size());
+			// System.out.println(ev.getRelatedFormInputs().size());
 			relatedFormInputsList.add(temporaryList);
 			path = path.immutableCopyWithoutLast();
 			by.add(getWebDriverBy(ev.getIdentification()));
 		}
 	}
 
-	public ImmutableSortedSet<String> getFilterAttributes() {
-		return filterAttributes;
+	private SortedSet<String> checkEscapeSequence(ImmutableSortedSet<String> attributes) {
+		SortedSet<String> set = new TreeSet<String>();
+		for (String str : attributes) {
+			set.add(StringEscapeUtils.escapeJava(str));
+		}
+		return set;
 	}
 
-	public CrawlerContext getContext() {
-		return context;
+	public SortedSet<String> getFilterAttributes() {
+		return checkEscapeSequence(filterAttributes);
 	}
 
 	public CopyOnWriteArrayList<FormInputElement> getFormInputElements() {
@@ -70,7 +75,7 @@ public class CrawlpathElement {
 			return false;
 	}
 
-	public ArrayList<Integer> getLoop() {
+	public List<Integer> getLoop() {
 		return loop;
 	}
 
@@ -82,11 +87,11 @@ public class CrawlpathElement {
 		return DOUBLEQUOTATION + url + DOUBLEQUOTATION;
 	}
 
-	public String getWebDriverBy(Identification id) {
-
+	private String getWebDriverBy(Identification id) {
+		String template = DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
 		switch (id.getHow()) {
 			case name:
-				return "By.name(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
+				return "By.name(" + template;
 
 			case xpath:
 				// Work around HLWK driver bug
@@ -95,21 +100,19 @@ public class CrawlpathElement {
 				        + ")";
 
 			case id:
-				return "By.id(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
+				return "By.id(" + template;
 
 			case tag:
-				return "By.tagName(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
+				return "By.tagName(" + template;
 
 			case text:
-				return "By.linkText(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
+				return "By.linkText(" + template;
 
 			case partialText:
-				return "By.partialLinkText(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION
-				        + ")";
+				return "By.partialLinkText(" + template;
 
 			default:
 				return null;
-
 		}
 
 	}

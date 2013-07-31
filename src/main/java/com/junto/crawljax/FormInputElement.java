@@ -1,5 +1,7 @@
 package com.junto.crawljax;
 
+import static java.lang.System.lineSeparator;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,13 +14,11 @@ public class FormInputElement {
 	private Identification identification;
 	private Set<InputValue> inputValues = new HashSet<InputValue>();
 	private final String DOUBLEQUOTATION = "\"";
-	private final String CRLF;
 
 	public FormInputElement(FormInput forminput) {
 		this.type = forminput.getType();
 		this.identification = forminput.getIdentification();
 		this.inputValues = forminput.getInputValues();
-		this.CRLF = System.lineSeparator();
 	}
 
 	public String generateFormInputCode() {
@@ -35,7 +35,7 @@ public class FormInputElement {
 			String code =
 			        "selectElement = new Select(driver.findElement("
 			                + getWebDriverBy(this.identification)
-			                + "));" + CRLF;
+			                + "));" + lineSeparator();
 			for (InputValue inputValue : inputValues) {
 				code += generateSelectcode(inputValue);
 			}
@@ -47,23 +47,23 @@ public class FormInputElement {
 
 	private String generateSelectcode(InputValue inputValue) {
 		String code = "";
-		code += "try{" + CRLF
+		code += "try{" + lineSeparator()
 		        + "selectElement.selectByVisibleText(" + DOUBLEQUOTATION
-		        + inputValue.getValue() + DOUBLEQUOTATION + ");" + CRLF
-		        + "}catch(Exception e){}" + CRLF;
+		        + inputValue.getValue() + DOUBLEQUOTATION + ");" + lineSeparator()
+		        + "}catch(Exception e){}" + lineSeparator();
 
-		code += "try{" + CRLF
+		code += "try{" + lineSeparator()
 		        + "selectElement.selectByValue(" + DOUBLEQUOTATION
-		        + inputValue.getValue() + DOUBLEQUOTATION + ");" + CRLF
-		        + "}catch(Exception e){}" + CRLF;
+		        + inputValue.getValue() + DOUBLEQUOTATION + ");" + lineSeparator()
+		        + "}catch(Exception e){}" + lineSeparator();
 		return code;
 	}
 
-	public String getWebDriverBy(Identification id) {
-
+	private String getWebDriverBy(Identification id) {
+		String template = DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
 		switch (id.getHow()) {
 			case name:
-				return "By.name(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
+				return "By.name(" + template;
 
 			case xpath:
 				// Work around HLWK driver bug
@@ -72,17 +72,16 @@ public class FormInputElement {
 				        + ")";
 
 			case id:
-				return "By.id(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
+				return "By.id(" + template;
 
 			case tag:
-				return "By.tagName(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
+				return "By.tagName(" + template;
 
 			case text:
-				return "By.linkText(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
+				return "By.linkText(" + template;
 
 			case partialText:
-				return "By.partialLinkText(" + DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION
-				        + ")";
+				return "By.partialLinkText(" + template;
 
 			default:
 				return null;
