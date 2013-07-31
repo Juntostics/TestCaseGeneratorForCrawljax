@@ -16,6 +16,8 @@ public class InvariantViolatingTestGeneratorPlugin implements OnInvariantViolati
 	public void onInvariantViolation(Invariant invariant, CrawlerContext context) {
 		// TODO Auto-generated method stub
 		generator.generateTest(context);
+		context.getBrowser().close();
+		System.out.println("There is an error.");
+		System.out.println("generated testcode.");
 	}
-
 }

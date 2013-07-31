@@ -46,7 +46,7 @@ public class WebapplicationTest {
 		#foreach($number in $element.getLoop())
 		#if(!$element.FormInputIsEmpty())
 		#foreach($formInputElement in $element.getFormInputElements())
-		$formInputElement.generateFormInputCode();
+		$formInputElement.generateFormInputCode()
 		#end
 		#end
 		

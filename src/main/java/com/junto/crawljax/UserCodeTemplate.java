@@ -9,8 +9,10 @@ import com.crawljax.core.configuration.CrawljaxConfiguration.CrawljaxConfigurati
 public class UserCodeTemplate implements OurInterface {
 	public UserCodeTemplate() {
 		CrawljaxConfigurationBuilder builder =
-		        CrawljaxConfiguration.builderFor("http://www.ahref.org/hinagata/form_all.html");
+		        CrawljaxConfiguration
+		                .builderFor("file:///Users/Junto/Downloads/fromN/login.html");
 		builder.crawlRules().addInvariant(genInvariant());
+		builder.setMaximumDepth(5);
 		builder.addPlugin(
 		        new InvariantViolatingTestGeneratorPlugin(
 		                "/Users/Junto/workspace/testcase-generator-plugin/src/main/java/com/junto/crawljax/UserCodeTemplate.java"));
@@ -21,8 +23,8 @@ public class UserCodeTemplate implements OurInterface {
 	@GenerateInvariant
 	public Invariant genInvariant() {
 		// complicated
-		return new Invariant("Invariant", new NotRegexCondition(
-		        "acmailer（エーシーメーラー）は"));
+		return new Invariant("String 'Error' is detected",
+		        new NotRegexCondition("Error"));
 	}
 
 	@ExtractToTestCode
