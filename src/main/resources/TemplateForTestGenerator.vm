@@ -54,7 +54,7 @@ public class $className {
 		WebDriverBackedEmbeddedBrowser browser = WebDriverBackedEmbeddedBrowser.withDriver(
 		driver,generateFilterAttributes(), waitAfterReloadUrl,waitAfterEvent);
     	Invariant userInvariant = genInvariant();
-    	assertTrue(userInvariant.getInvariantCondition().check(embeddedBrowser));
+    	assertTrue(userInvariant.getInvariantCondition().check(browser));
 	}
 	
 	private ImmutableSortedSet<String> generateFilterAttributes(){
@@ -69,7 +69,5 @@ public class $className {
   
   	#foreach($string in $extractor.getExtractToTestCodeSourcecode())
   	$string
-  	#end
-  
-	
+  	#end 
 }

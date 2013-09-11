@@ -10,13 +10,13 @@ import com.crawljax.core.configuration.CrawljaxConfiguration.CrawljaxConfigurati
 import com.junto.crawljax.ExtractToTestCode;
 import com.junto.crawljax.GenerateInvariant;
 import com.junto.crawljax.InvariantViolatingTestGeneratorPlugin;
-import com.junto.crawljax.OurInterface;
+import com.junto.crawljax.TestCaseGeneratorHost;
 
-public class GenerateTestExample implements OurInterface {
+public class GenerateTestExample implements TestCaseGeneratorHost {
 	public GenerateTestExample() {
 		CrawljaxConfigurationBuilder builder =
 		        CrawljaxConfiguration
-		                .builderFor("file:///Users/Junto/Downloads/fromN/login.html");
+		                .builderFor("http://juntostics.github.io/TestCaseGeneratorForCrawljax/login_example/login.html");
 		builder.crawlRules().addInvariant(genInvariant());
 		builder.setMaximumDepth(5);
 		builder.addPlugin(
@@ -29,16 +29,15 @@ public class GenerateTestExample implements OurInterface {
 	}
 
 	@GenerateInvariant
-	public Invariant genInvariant() {
-		// complicated
-		return new Invariant("String 'Error' is detected",
-		        new NotRegexCondition("Error"));
-	}
+    public Invariant genInvariant() {
+        return new Invariant(errorMsg("404"),
+                new NotRegexCondition("404"));
+    }
 
-	@ExtractToTestCode
-	public String helperMethod() {
-		return "some string";
-	}
+    @ExtractToTestCode
+    public String errorMsg(String errorCode) {
+        return "Error code " + errorCode + " is observed!";
+    }
 
 	public static void main(String[] args) {
 		new GenerateTestExample();

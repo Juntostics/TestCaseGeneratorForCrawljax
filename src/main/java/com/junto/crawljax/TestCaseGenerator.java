@@ -15,24 +15,23 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import com.crawljax.core.CrawlerContext;
 
 public class TestCaseGenerator {
-	private final String pathToSourceFile;
-	private String outputDirectryPath;
-	private String outputFileName = "GeneratedTestCase.java";
+	private String outputDirectoryPath;
+	private static final String OUTPUT_FILENAME_DEFAULT = "GeneratedTestCase.java";
+	private String outputFileName = OUTPUT_FILENAME_DEFAULT;
 	private String packageName;
 	private AnnotatedCodeExtractor extractor = null;
 	private long waitAfterReloadUrl = 500;
 	private long waitAfterEvent = 500;
 
 	public TestCaseGenerator(String pathToSourceFile) {
-		this.pathToSourceFile = pathToSourceFile;
-		this.outputDirectryPath = new File(".").getAbsolutePath();
-		if (this.outputDirectryPath == "/")
-			outputDirectryPath = "";
+		this.outputDirectoryPath = new File(".").getAbsolutePath();
+		if (this.outputDirectoryPath.equals("/"))
+			outputDirectoryPath = "";
 		this.packageName = TestCaseGenerator.class.getPackage().getName();
 		try {
 			this.extractor = new AnnotatedCodeExtractor(pathToSourceFile);
 		} catch (Exception e) {
-			throw (IllegalStateException) e;
+			throw new IllegalStateException("Your pathToSourceFile is wrong",e);
 		}
 	}
 
@@ -42,14 +41,11 @@ public class TestCaseGenerator {
 		CrawlpathElement element = new CrawlpathElement(context);
 
 		try {
-			// これをinitする前にいれないと動かない
 			Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
 			Velocity.setProperty("classpath.resource.loader.class",
 			        ClasspathResourceLoader.class.getName());
 
-			// initialization
 			Velocity.init();
-			// make Velocity context
 
 			VelocityContext velocitycontext = new VelocityContext();
 			velocitycontext.put("element", element);
@@ -60,11 +56,10 @@ public class TestCaseGenerator {
 			velocitycontext.put("waitAfterReloadUrl", waitAfterReloadUrl);
 			velocitycontext.put("waitAfterEvent", waitAfterEvent);
 
-			File file = new File(outputDirectryPath + "/" + outputFileName);
+			File file = new File(outputDirectoryPath + "/" + outputFileName);
 			PrintWriter pw =
 			        new PrintWriter(file);
 
-			// make Template
 			Template template = Velocity.getTemplate("TemplateForTestGenerator.vm", "UTF-8");
 			template.merge(velocitycontext, pw);
 			pw.flush();
@@ -84,8 +79,8 @@ public class TestCaseGenerator {
 		}
 	}
 
-	public void setOutputDirectryPath(String outputDirectryPath) {
-		this.outputDirectryPath = outputDirectryPath;
+	public void setoutputDirectoryPath(String outputDirectoryPath) {
+		this.outputDirectoryPath = outputDirectoryPath;
 	}
 
 	public void setOutputFileName(String outputFileName) {

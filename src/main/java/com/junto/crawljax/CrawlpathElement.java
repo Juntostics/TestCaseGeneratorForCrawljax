@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableSortedSet;
 
 public class CrawlpathElement {
 	private final int size;
-	List<Integer> loop;// for <foreach> of velocity
+	List<Integer> loop;
 	private LinkedList<String> by;
 	private LinkedList<CopyOnWriteArrayList<FormInputElement>> relatedFormInputsList;
 	private final String url;
@@ -45,10 +45,9 @@ public class CrawlpathElement {
 			for (FormInput formInput : ev.getRelatedFormInputs()) {
 				temporaryList.add(new FormInputElement(formInput));
 			}
-			// System.out.println(ev.getRelatedFormInputs().size());
 			relatedFormInputsList.add(temporaryList);
 			path = path.immutableCopyWithoutLast();
-			by.add(getWebDriverBy(ev.getIdentification()));
+			by.add(WebDriverUtils.idToString(ev.getIdentification()));
 		}
 	}
 
@@ -87,34 +86,5 @@ public class CrawlpathElement {
 		return DOUBLEQUOTATION + url + DOUBLEQUOTATION;
 	}
 
-	private String getWebDriverBy(Identification id) {
-		String template = DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
-		switch (id.getHow()) {
-			case name:
-				return "By.name(" + template;
-
-			case xpath:
-				// Work around HLWK driver bug
-				return "By.xpath(" + DOUBLEQUOTATION
-				        + id.getValue().replaceAll("/BODY\\[1\\]/", "/BODY/") + DOUBLEQUOTATION
-				        + ")";
-
-			case id:
-				return "By.id(" + template;
-
-			case tag:
-				return "By.tagName(" + template;
-
-			case text:
-				return "By.linkText(" + template;
-
-			case partialText:
-				return "By.partialLinkText(" + template;
-
-			default:
-				return null;
-		}
-
-	}
 
 }

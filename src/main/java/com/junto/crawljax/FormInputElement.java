@@ -25,16 +25,16 @@ public class FormInputElement {
 		if (type.toLowerCase().startsWith("text")
 		        || type.equalsIgnoreCase("password")
 		        || type.equalsIgnoreCase("hidden")) {
-			return "driver.findElement(" + getWebDriverBy(this.identification)
+			return "driver.findElement(" + WebDriverUtils.idToString(this.identification)
 			        + ").sendKeys(" + DOUBLEQUOTATION
 			        + this.inputValues.iterator().next().toString() + DOUBLEQUOTATION + ");";
 		} else if (type.equals("checkbox") || type.equals("radio")) {
-			return "driver.findElement(" + getWebDriverBy(this.identification)
+			return "driver.findElement(" + WebDriverUtils.idToString(this.identification)
 			        + ").click();";
 		} else if (type.startsWith("select")) {
 			String code =
 			        "selectElement = new Select(driver.findElement("
-			                + getWebDriverBy(this.identification)
+			                + WebDriverUtils.idToString(this.identification)
 			                + "));" + lineSeparator();
 			for (InputValue inputValue : inputValues) {
 				code += generateSelectcode(inputValue);
@@ -57,36 +57,5 @@ public class FormInputElement {
 		        + inputValue.getValue() + DOUBLEQUOTATION + ");" + lineSeparator()
 		        + "}catch(Exception e){}" + lineSeparator();
 		return code;
-	}
-
-	private String getWebDriverBy(Identification id) {
-		String template = DOUBLEQUOTATION + id.getValue() + DOUBLEQUOTATION + ")";
-		switch (id.getHow()) {
-			case name:
-				return "By.name(" + template;
-
-			case xpath:
-				// Work around HLWK driver bug
-				return "By.xpath(" + DOUBLEQUOTATION
-				        + id.getValue().replaceAll("/BODY\\[1\\]/", "/BODY/") + DOUBLEQUOTATION
-				        + ")";
-
-			case id:
-				return "By.id(" + template;
-
-			case tag:
-				return "By.tagName(" + template;
-
-			case text:
-				return "By.linkText(" + template;
-
-			case partialText:
-				return "By.partialLinkText(" + template;
-
-			default:
-				return null;
-
-		}
-
 	}
 }
